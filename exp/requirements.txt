@@ -1,0 +1,8 @@
+torch>=2.1
+torch-geometric>=2.4
+sentence-transformers>=2.5
+scikit-learn
+numpy
+openai>=1.0
+pyyaml
+tqdm

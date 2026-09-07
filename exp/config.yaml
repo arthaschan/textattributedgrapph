@@ -1,0 +1,40 @@
+data_dir: data
+out_dir: out
+cache_dir: cache
+
+dataset: cora_node
+encoder: minilm        # bow | minilm | roberta
+model: gcn             # mlp | gcn | gat | gprgnn | cosgcn | nspgnn
+attack: none           # none | pgd_evasion | heur_poison | text_evasion | text_poison
+ptb: 0.2
+split: inductive       # inductive(60/20/20) | transductive(10/10/80) | official
+seeds: 3
+
+train:
+  lr: 0.01
+  weight_decay: 0.0005
+  dropout: 0.5
+  hidden: 128
+  epochs: 400
+  patience: 100
+  gpr_alpha: 0.1
+
+bow:
+  max_features: 10000
+
+cosgcn:
+  threshold: 0.5
+
+text_attack:
+  budget_on_train: 0.8   # poisoning 用
+  budget_on_test: 0.4    # evasion 用
+  max_neighbors_in_prompt: 6
+  low_degree_bias: true
+  max_text_len: 200
+
+vllm:
+  url: http://localhost:8000/v1
+  model: Qwen/Qwen3-32B
+  temperature: 0.7
+
+device: auto            # auto | cuda | cpu
