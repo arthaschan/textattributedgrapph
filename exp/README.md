@@ -67,4 +67,30 @@ python taglas_bench.py --dataset cora_node --encoder roberta --model gcn --attac
 - [ ] text_evasion 0.2 能调通本地 vLLM（Qwen3-32B）改写 10 个节点并完成重编码评测
 - [ ] 输出：out/{dataset}/{encoder}/{model}_{attack}_{ptb}/seed*.json + 汇总 md 表
 
+## 6. 理论实验钩子（P1/P2/P3，`theory_analysis.py`）
+
+为论文理论章节（`docs/theory_extension_roadmap.md` 的 P1–P4）配的量化工具，核心几何是纯 numpy/scipy，
+可在 CPU 上冒烟验证（`python smoke_theory.py`），真实数据走 torch 加载。
+
+```bash
+# 冒烟测试（无需 GPU/数据，验证 numpy 核心 + 钩子输出的合理性）
+python smoke_theory.py
+
+# P1 真实数据：恶意 vs 良性边在 Ω(X)/Ω(AX)/Ω(A²X) 的 KL/JS/Cohen's d/AUC
+# （复刻 NSPGNN Fig.2 / Table I；恶意边 = 攻击注入边，用 edge_diff 自动标注）
+python theory_analysis.py --task p1 --dataset cora_node --encoder minilm \
+    --attack pgd_evasion --ptb 0.2 --taus 0,1,2
+```
+
+钩子接口（供实验脚本直接 import）：
+- `neighbor_similarity_analysis(X, edge_index, malicious_edges, n, taus)` → P1 密度/KL 诊断。
+- `loss_decomposition(X, A_clean, A_attacked, X_attacked, y, ...)` → P2：SGC 攻击损失分解为
+  struct / text / cross 三项 + Theorem-1 结构幅值（`thm1_magnitude_*`）。
+- `text_direction_analysis(X, X_attacked, y, edge_index, attacked_ids)` → P3：文本偏移 ΔX 与
+  「远离本类质心 / 靠近邻居优势类质心」方向的余弦一致度。
+- `edge_diff(clean_ei, attacked_ei)` → 从任意攻击产物（含 TGRB 的）标注注入/删除边。
+
+注意：P2/P3 的 `X_attacked` 需要「被改写文本重新编码后的 embedding」（即 ΔX = E(S′)−E(S) 的真实像），
+真实数据上需接 vLLM 文本改写管线；`synthetic_text_perturbation()` 只用于冒烟/单元测试。
+
 诚实声明：本脚手架未经 GPU 实测，属"可执行初稿"，S0 阶段可能有少量 bug，跑挂把堆栈贴回来我修。

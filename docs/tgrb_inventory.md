@@ -92,7 +92,7 @@ cd ../LLM_scripts && bash run_sft_ind.sh cora 0 Mistral-7B auto   # ★ SFT-auto
 1. 仓库**无 License**、单次快照提交，README 部分沿用了上游 LLMNodeBed 模板（如提到的 main.py 实际是 train.py），落地以目录内脚本为准。
 2. `common/dataloader.py` 路径**硬编码**无环境变量；re_split 语义在两处文档不一致（README 说 1=supervised，API 摘录说 2=60/20/20 inductive），落地时以代码为准。
 3. 论文内部不一致：结构 poisoning 表题注 ptb=0.2 vs 正文 0.30；正文"SFT-neighbor 掉 25%" vs 附录表推算 ~35%；正文 Figure 4/6/10 的 pdftotext 列错位（需查原 PDF/原图）。引用数字时以附录数值表为准并注明口径。
-4. 10 个数据集的**文本字段来源未在论文写明**（标题+摘要？简介？评论？），需回 LLMNodeBed（github.com/WxxShirley/LLMNodeBed）与原始数据集确认——做文本攻击实验前必须先确认文本语义质量。
+4. 10 个数据集的**文本字段来源未在论文写明**（标题+摘要？简介？评论？）——**已核对解决**：LLMNodeBed 源码 `common/descriptions.py` 确认 raw_texts 来源（学术图=标题+摘要、社交图=profile/subreddit 内容、电商图=评论/描述），详见 `docs/llmnodebed_text_fields.md`。做文本攻击实验前仍建议抽样质检语义质量。
 5. GraphLLM 端到端评测（预测→acc）脚本未能从仓库核对到唯一入口（inference_vllm.py 推测），跑 LLM 前先摸清其产出格式。
 
 ## 9. 对 NSPGNN → TAG 扩展的启示（本清单的核心结论）

@@ -191,12 +191,10 @@ def heuristic_perturb(edge_index, y, n, ptb, seed, mode="poison", device="cpu"):
             E.add((u, v))
             add.append((u, v))
     rng.shuffle(cand_remove)
-    new_e = list(map(tuple, edge_index.t().tolist()))
-    for u, v in cand_remove[:n_del]:
-        if (u, v) in E:
-            E.discard((u, v))
-            new_e.remove((u, v))
-    all_e = list(E) + add
+    removed = cand_remove[:n_del]
+    for u, v in removed:
+        E.discard((u, v))
+    all_e = list(E)  # E already holds original (minus removed) + added edges
     ei = torch.tensor(all_e, dtype=torch.long).t().contiguous()
     return ei
 
